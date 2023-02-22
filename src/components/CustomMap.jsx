@@ -16,31 +16,19 @@ const containerStyle = {
   height: "800px",
 };
 
+// created a center
 const center = {
   lat: 48.85,
   lng: 2.35,
 };
 
+// and a location to put the marker from the beginning
 const locations = [
   {
     details: "AbC",
     coordinates: center,
   },
 ];
-
-const lineOptions = {
-  strokeColor: "#FF0000",
-  strokeOpacity: 0.8,
-  strokeWeight: 2,
-  fillColor: "#FF0000",
-  fillOpacity: 0.35,
-  clickable: false,
-  draggable: false,
-  editable: false,
-  visible: true,
-  radius: 30000,
-  zIndex: 1,
-};
 
 function CustomMap() {
   const { isLoaded } = useJsApiLoader({
@@ -55,7 +43,10 @@ function CustomMap() {
 
   // to track by index to update end of the started drag & not any other
   const [dragIndex, setDragIndex] = useState(0);
+  // points are the start and end coordinates of the drag
   const [dragPoints, setDragPoints] = useState([]);
+  // it will contain all starting points and starting & end point of the last drag
+  // otherwise the last line wont be drawn
   const [dragPath, setDragPath] = useState([]);
 
   const onLoad = useCallback(function callback(map) {
@@ -68,8 +59,9 @@ function CustomMap() {
     setMap(null);
   }, []);
 
+  // this useeffect watched on the change of dragIndex value
   useEffect(() => {
-    console.log(dragIndex);
+    // console.log(dragIndex);
     let _dragPath = [];
     for (let i = 0; i < dragPoints.length; i++) {
       let el = dragPoints[i];
@@ -110,6 +102,7 @@ function CustomMap() {
                 lng: e.latLng.lng(),
               };
 
+              // stores the drag point at start
               let _dragPoints = dragPoints;
               _dragPoints.push({});
               _dragPoints.at(dragIndex).start = dragStartPoint;
@@ -121,9 +114,12 @@ function CustomMap() {
                 lng: e.latLng.lng(),
               };
 
+              // stores the drag point at end
               let _dragPoints = dragPoints;
               _dragPoints.at(dragIndex).end = dragEndPoint;
               setDragPoints(_dragPoints);
+
+              // updates the index of the drag for the next dragStart
               setDragIndex(dragIndex + 1);
             }}
           />
@@ -131,7 +127,7 @@ function CustomMap() {
         </>
       </GoogleMap>
       {/* </LoadScriptNext> */}
-      <pre>{JSON.stringify(dragPath, null, 2)}</pre>
+      <pre>{JSON.stringify({ dragPoints, dragPath }, null, 2)}</pre>
     </Fragment>
   ) : (
     <Fragment></Fragment>
